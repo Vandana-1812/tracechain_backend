@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TraceChain - Scan Product</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- QR Code Scanner Library (jsQR) -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Light blue-gray background */
+            color: #334155; /* Darker text for readability */
+        }
+        .container-padding {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        @media (min-width: 640px) {
+            .container-padding {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
+        @media (min-width: 1024px) {
+            .container-padding {
+                padding-left: 4rem;
+                padding-right: 4rem;
+            }
+        }
+        /* Custom modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* Style for the video feed and canvas */
+        #video {
+            width: 100%;
+            max-width: 600px; /* Limit max width for better mobile view */
+            height: auto;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            display: block; /* Ensure it takes full width of its container */
+            margin-left: auto;
+            margin-right: auto;
+            background-color: #e2e8f0; /* gray-200 placeholder */
+        }
+        #canvas {
+            display: none; /* Hidden by default, used for processing frames */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navigation Bar (Copied from index.html for consistency) -->
+    <nav class="bg-white shadow-lg p-4 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex justify-between items-center container-padding">
+            <a href="index.html" class="text-2xl font-bold text-indigo-700 rounded-lg p-2 hover:bg-indigo-50 transition duration-300">TraceChain</a>
+            <div class="flex space-x-6">
+                <a href="index.html" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-300">Home</a>
+                <a href="index.html#features" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-300">Features</a>
+                <a href="index.html#how-it-works" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-300">How It Works</a>
+                <a href="register.html" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-300">Register Product</a>
+                <a href="scan.html" class="text-indigo-600 font-medium transition duration-300">Scan Product</a>
+                <a href="admin.html" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-300">Admin Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow py-16 container-padding">
+        <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-4xl font-bold text-center mb-8 text-gray-800">Scan Product QR Code</h2>
+            <p class="text-center text-gray-600 mb-8">Point your camera at a product's QR code to instantly verify its authenticity and trace its history.</p>
+
+            <!-- QR Scanner Section -->
+            <div id="scannerSection" class="text-center mb-8">
+                <video id="video" class="bg-gray-200 mb-4" autoplay playsinline></video>
+                <canvas id="canvas"></canvas>
+                <div id="loadingScanner" class="hidden mt-4">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-500 border-t-transparent"></div>
+                    <p class="text-gray-600 mt-2">Loading camera...</p>
+                </div>
+                <button id="startButton" class="mt-6 bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-indigo-700 transform hover:scale-105 transition duration-300 ease-in-out">
+                    Start Scanning
+                </button>
+                <button id="stopButton" class="mt-6 bg-red-600 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-red-700 transform hover:scale-105 transition duration-300 ease-in-out hidden">
+                    Stop Scanning
+                </button>
+                <p id="scanMessage" class="mt-4 text-gray-500">Click "Start Scanning" to begin.</p>
+            </div>
+
+            <!-- Product Details Display Section -->
+            <div id="productDetailsSection" class="mt-12 p-6 bg-gray-50 rounded-xl border border-gray-200 hidden">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">Product Details</h3>
+                <div id="verificationStatus" class="text-center text-xl font-semibold mb-6"></div>
+
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-gray-700 font-semibold">Product ID:</p>
+                        <p id="displayProductId" class="text-indigo-600 break-words"></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-700 font-semibold">Product Name:</p>
+                        <p id="displayProductName" class="text-gray-900"></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-700 font-semibold">Origin:</p>
+                        <p id="displayProductOrigin" class="text-gray-900"></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-700 font-semibold">Description:</p>
+                        <p id="displayProductDescription" class="text-gray-900"></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-700 font-semibold">Certifications:</p>
+                        <p id="displayCertifications" class="text-gray-900"></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-700 font-semibold">Manufacturer ID:</p>
+                        <p id="displayManufacturerId" class="text-gray-900 break-words"></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-700 font-semibold">Registered At:</p>
+                        <p id="displayRegisteredAt" class="text-gray-900"></p>
+                    </div>
+                </div>
+                <div class="text-center mt-8">
+                    <a id="viewHistoryButton" href="#" class="bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-indigo-700 transform hover:scale-105 transition duration-300 ease-in-out">
+                        View Full Traceability History
+                    </a>
+                </div>
+            </div>
+
+            <!-- Product Not Found Section -->
+            <div id="productNotFoundSection" class="mt-12 p-6 bg-red-50 rounded-xl border border-red-200 text-center hidden">
+                <h3 class="text-2xl font-bold text-red-700 mb-4">Product Not Found</h3>
+                <p class="text-red-600 mb-4">The scanned QR code does not correspond to a registered product on TraceChain, or the product ID is invalid.</p>
+                <p class="text-gray-600">Please ensure you are scanning a valid TraceChain QR code.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer (Copied from index.html for consistency) -->
+    <footer class="bg-gray-800 text-white py-8 px-4 sm:px-6 lg:px-8 mt-auto">
+        <div class="max-w-7xl mx-auto text-center container-padding">
+            <p>&copy; 2025 TraceChain. All rights reserved. Building Trust in Retail.</p>
+        </div>
+    </footer>
+
+    <!-- Custom Modal for Messages -->
+    <div id="messageModal" class="modal flex">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <p id="modalMessage" class="text-lg font-medium text-gray-800"></p>
+            <button id="modalCloseBtn" class="mt-6 bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-300">Close</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK and Initialization -->
+    <script type="module">
+        // Firebase SDK imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables for Firebase config and app ID
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let app;
+        let db;
+        let auth;
+        let userId = null; // Initialize userId to null
+
+        // Get references to DOM elements
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const loadingScanner = document.getElementById('loadingScanner');
+        const scanMessage = document.getElementById('scanMessage');
+        const productDetailsSection = document.getElementById('productDetailsSection');
+        const productNotFoundSection = document.getElementById('productNotFoundSection');
+        const verificationStatus = document.getElementById('verificationStatus');
+
+        const displayProductId = document.getElementById('displayProductId');
+        const displayProductName = document.getElementById('displayProductName');
+        const displayProductOrigin = document.getElementById('displayProductOrigin');
+        const displayProductDescription = document.getElementById('displayProductDescription');
+        const displayCertifications = document.getElementById('displayCertifications');
+        const displayManufacturerId = document.getElementById('displayManufacturerId');
+        const displayRegisteredAt = document.getElementById('displayRegisteredAt');
+        const viewHistoryButton = document.getElementById('viewHistoryButton');
+
+        // Modal elements
+        const messageModal = document.getElementById('messageModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
+        const closeButton = document.querySelector('.close-button');
+
+        let stream; // To hold the camera stream
+        let animationFrameId; // To control the animation loop
+        let isScanning = false; // Flag to track scanning state
+
+        /**
+         * Displays a custom modal message to the user.
+         * @param {string} message - The message to display.
+         * @param {string} type - 'success' or 'error' to style the message.
+         */
+        function showModalMessage(message, type = 'info') {
+            modalMessage.textContent = message;
+            modalMessage.className = 'text-lg font-medium'; // Reset classes
+            if (type === 'success') {
+                modalMessage.classList.add('text-green-700');
+            } else if (type === 'error') {
+                modalMessage.classList.add('text-red-700');
+            } else {
+                modalMessage.classList.add('text-gray-800');
+            }
+            messageModal.style.display = 'flex'; // Show the modal
+        }
+
+        // Close modal event listeners
+        closeButton.onclick = () => {
+            messageModal.style.display = 'none';
+        };
+        modalCloseBtn.onclick = () => {
+            messageModal.style.display = 'none';
+        };
+        window.onclick = (event) => {
+            if (event.target == messageModal) {
+                messageModal.style.display = 'none';
+            }
+        };
+
+        /**
+         * Initializes Firebase and authenticates the user.
+         */
+        async function initializeFirebase() {
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                    console.log("Firebase: Signed in with custom token.");
+                } else {
+                    await signInAnonymously(auth);
+                    console.log("Firebase: Signed in anonymously.");
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        console.log("Firebase: Initialized. User ID:", userId);
+                        // If a product ID is in the URL, attempt to load it directly
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const productIdFromUrl = urlParams.get('productId');
+                        if (productIdFromUrl) {
+                            fetchProductDetails(productIdFromUrl);
+                            startButton.classList.add('hidden'); // Hide start button if loading from URL
+                            scanMessage.textContent = 'Loading product details from URL...';
+                        } else {
+                            // If no product ID in URL, show start button for scanning
+                            startButton.classList.remove('hidden');
+                            scanMessage.textContent = 'Click "Start Scanning" to begin.';
+                        }
+                    } else {
+                        console.log("Firebase: No user signed in. Attempting anonymous sign-in.");
+                        signInAnonymously(auth).then(userCredential => {
+                            userId = userCredential.user.uid;
+                            console.log("Firebase: Signed in anonymously after state change. User ID:", userId);
+                            const urlParams = new URLSearchParams(window.location.search);
+                            const productIdFromUrl = urlParams.get('productId');
+                            if (productIdFromUrl) {
+                                fetchProductDetails(productIdFromUrl);
+                                startButton.classList.add('hidden');
+                                scanMessage.textContent = 'Loading product details from URL...';
+                            } else {
+                                startButton.classList.remove('hidden');
+                                scanMessage.textContent = 'Click "Start Scanning" to begin.';
+                            }
+                        }).catch(error => {
+                            console.error("Firebase: Error signing in anonymously:", error);
+                            showModalMessage("Failed to authenticate. Please refresh the page.", 'error');
+                            startButton.disabled = true;
+                            startButton.textContent = 'Authentication Failed';
+                        });
+                    }
+                });
+
+            } catch (error) {
+                console.error("Firebase: Error initializing Firebase or signing in:", error);
+                showModalMessage("Failed to connect to backend. Please check your console for details.", 'error');
+                startButton.disabled = true;
+                startButton.textContent = 'Backend Error';
+            }
+        }
+
+        window.onload = initializeFirebase;
+
+        /**
+         * Starts the camera feed and QR scanning process.
+         */
+        async function startScanner() {
+            if (isScanning) return; // Prevent multiple starts
+
+            try {
+                loadingScanner.classList.remove('hidden');
+                startButton.classList.add('hidden');
+                stopButton.classList.add('hidden'); // Hide stop button until camera is truly ready
+                productDetailsSection.classList.add('hidden');
+                productNotFoundSection.classList.add('hidden');
+                scanMessage.textContent = 'Requesting camera access...';
+                video.style.display = 'block'; // Ensure video element is visible
+
+                // Request camera access
+                // Try 'environment' first, then fallback to default if not available
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                console.log("Scanner: Camera (environment) stream obtained.");
+                
+                video.srcObject = stream;
+                video.setAttribute('playsinline', true); // Required for iOS
+                await video.play();
+
+                // Wait for video to load enough data before drawing to canvas
+                video.addEventListener('loadedmetadata', () => { // Use loadedmetadata for dimensions
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    console.log(`Scanner: Video dimensions: ${video.videoWidth}x${video.videoHeight}`);
+                });
+
+                video.addEventListener('loadeddata', () => { // Use loadeddata for actual pixels
+                    loadingScanner.classList.add('hidden');
+                    stopButton.classList.remove('hidden'); // Show stop button after camera loads
+                    scanMessage.textContent = 'Scanning for QR code...';
+                    isScanning = true;
+                    animationFrameId = requestAnimationFrame(tick); // Start the scanning loop
+                    console.log("Scanner: Camera ready and scanning started.");
+                }, { once: true }); // Only run this listener once
+
+            } catch (err) {
+                console.error("Scanner: Error accessing camera: ", err);
+                loadingScanner.classList.add('hidden');
+                startButton.classList.remove('hidden');
+                stopButton.classList.add('hidden');
+                video.style.display = 'none'; // Hide video element if camera fails
+                isScanning = false;
+
+                let errorMessage = "Could not access camera. Please ensure you have given permission and try again.";
+                if (err.name === 'NotAllowedError') {
+                    errorMessage = "Camera access denied. Please allow camera permissions in your browser settings for this site.";
+                } else if (err.name === 'NotFoundError') {
+                    errorMessage = "No camera found on this device.";
+                } else if (err.name === 'NotReadableError') {
+                    errorMessage = "Camera is already in use by another application.";
+                } else if (err.name === 'OverconstrainedError') {
+                    errorMessage = "Camera constraints (e.g., 'environment' facing mode) could not be satisfied by your device.";
+                }
+                showModalMessage(errorMessage, 'error');
+                scanMessage.textContent = 'Camera access failed. Try refreshing.';
+            }
+        }
+
+        /**
+         * Stops the camera feed and scanning process.
+         */
+        function stopScanner() {
+            if (stream) {
+                console.log("Scanner: Stopping camera stream.");
+                stream.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+            }
+            if (animationFrameId) {
+                console.log("Scanner: Cancelling animation frame.");
+                cancelAnimationFrame(animationFrameId);
+            }
+            isScanning = false;
+            startButton.classList.remove('hidden');
+            stopButton.classList.add('hidden');
+            video.style.display = 'none'; // Hide video when stopped
+            scanMessage.textContent = 'Scanning stopped. Click "Start Scanning" to resume.';
+            productDetailsSection.classList.add('hidden');
+            productNotFoundSection.classList.add('hidden');
+        }
+
+        /**
+         * Main animation loop for QR code scanning.
+         */
+        function tick() {
+            if (!isScanning) {
+                console.log("Scanner: Tick stopped because isScanning is false.");
+                return; // Stop if scanning is no longer active
+            }
+
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: "dontInvert",
+                });
+
+                if (code) {
+                    console.log("Scanner: QR Code detected:", code.data);
+                    stopScanner(); // Stop scanning once a QR code is found
+                    processQrCodeData(code.data);
+                    return; // Exit tick loop
+                }
+            }
+            animationFrameId = requestAnimationFrame(tick);
+        }
+
+        /**
+         * Processes the data extracted from the QR code.
+         * @param {string} qrData - The data string from the QR code.
+         */
+        function processQrCodeData(qrData) {
+            // Expecting QR data to be a URL like: http://localhost:5500/scan.html?productId=YOUR_PRODUCT_ID
+            try {
+                const url = new URL(qrData);
+                const productId = url.searchParams.get('productId');
+                if (productId) {
+                    console.log("Scanner: Extracted Product ID:", productId);
+                    fetchProductDetails(productId);
+                } else {
+                    showModalMessage("Invalid QR code format. Product ID not found in URL. Please scan a valid TraceChain QR code.", 'error');
+                    productNotFoundSection.classList.remove('hidden');
+                    scanMessage.textContent = 'Invalid QR code.';
+                }
+            } catch (e) {
+                console.error("Scanner: Error parsing QR data as URL:", e);
+                showModalMessage("Invalid QR code data. Please scan a valid TraceChain QR code.", 'error');
+                productNotFoundSection.classList.remove('hidden');
+                scanMessage.textContent = 'Invalid QR code data.';
+            }
+        }
+
+        /**
+         * Fetches product details from Firestore based on productId.
+         * @param {string} productId - The ID of the product to fetch.
+         */
+        async function fetchProductDetails(productId) {
+            if (!userId) {
+                showModalMessage("Authentication not ready. Cannot fetch product details. Please wait for Firebase initialization.", 'error');
+                scanMessage.textContent = 'Authentication not ready.';
+                return;
+            }
+
+            productDetailsSection.classList.add('hidden');
+            productNotFoundSection.classList.add('hidden');
+            scanMessage.textContent = 'Fetching product details...';
+
+            try {
+                // Query Firestore for the product using its productId
+                // Collection path: /artifacts/{appId}/users/{userId}/products
+                const productsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/products`);
+                const q = query(productsCollectionRef, where("productId", "==", productId));
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    const productDoc = querySnapshot.docs[0].data();
+                    console.log("Firestore: Product Found:", productDoc);
+
+                    // Display product details
+                    displayProductId.textContent = productDoc.productId;
+                    displayProductName.textContent = productDoc.productName;
+                    displayProductOrigin.textContent = productDoc.productOrigin;
+                    displayProductDescription.textContent = productDoc.productDescription || 'N/A';
+                    displayCertifications.textContent = productDoc.certifications && productDoc.certifications.length > 0
+                        ? productDoc.certifications.join(', ')
+                        : 'None';
+                    displayManufacturerId.textContent = productDoc.manufacturerId || 'N/A';
+                    displayRegisteredAt.textContent = productDoc.registeredAt ?
+                        new Date(productDoc.registeredAt.toDate()).toLocaleString() : 'N/A'; // Convert Firestore Timestamp to readable date
+
+                    verificationStatus.innerHTML = '<span class="text-green-600">✅ Verified: Authentic Product</span>';
+                    productDetailsSection.classList.remove('hidden');
+                    scanMessage.textContent = 'Product details loaded. <a href="scan.html" class="text-indigo-600 hover:underline">Scan another?</a>';
+
+                    // Set the link for "View Full Traceability History"
+                    viewHistoryButton.href = `history.html?productId=${productDoc.productId}`;
+
+                } else {
+                    console.log("Firestore: No product found with ID:", productId);
+                    productNotFoundSection.classList.remove('hidden');
+                    scanMessage.textContent = 'Product not found.';
+                    verificationStatus.innerHTML = '<span class="text-red-600">❌ Invalid Product</span>';
+                }
+            } catch (error) {
+                console.error("Firestore: Error fetching product details:", error);
+                showModalMessage("Error fetching product details. Please try again.", 'error');
+                productNotFoundSection.classList.remove('hidden');
+                scanMessage.textContent = 'Error fetching product details.';
+            }
+        }
+
+        // Event Listeners
+        startButton.addEventListener('click', startScanner);
+        stopButton.addEventListener('click', stopScanner);
+
+        // Initial state setup on page load
+        window.addEventListener('load', () => {
+            // Hide video initially until scanner starts
+            video.style.display = 'none';
+            // Check if a product ID is in the URL (e.g., from a direct QR scan link)
+            const urlParams = new URLSearchParams(window.location.search);
+            const productIdFromUrl = urlParams.get('productId');
+            if (productIdFromUrl) {
+                // If product ID is in URL, hide scanner controls and directly fetch details
+                document.getElementById('scannerSection').classList.add('hidden');
+                productDetailsSection.classList.add('hidden');
+                productNotFoundSection.classList.add('hidden');
+                // Firebase initialization will handle calling fetchProductDetails once auth is ready
+            } else {
+                // If no product ID, show start button for scanning
+                startButton.classList.remove('hidden');
+                scanMessage.textContent = 'Click "Start Scanning" to begin.';
+            }
+        });
+    </script>
+</body>
+</html>

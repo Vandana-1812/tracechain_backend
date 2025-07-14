@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Product Traceability - Home</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Light blue-gray background */
+            color: #334155; /* Darker text for readability */
+            /* Subtle radial gradient background for the entire body */
+            background-image: radial-gradient(circle at 100% 100%, #e0e7ff, #f8fafc);
+        }
+        /* Custom styles for hero section background pattern */
+        .hero-pattern {
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px),
+                              radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+        }
+        .container-padding {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        @media (min-width: 640px) {
+            .container-padding {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
+        @media (min-width: 1024px) {
+            .container-padding {
+                padding-left: 4rem;
+                padding-right: 4rem;
+            }
+        }
+
+        /* Timeline specific styles for Features section */
+        .features-timeline {
+            position: relative;
+            padding: 20px 0;
+            list-style: none;
+        }
+        .features-timeline:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 2px;
+            background-color: #a78bfa; /* purple-400 for a chain-like color */
+            margin-left: -1px;
+        }
+        .features-timeline-item {
+            position: relative;
+            margin-bottom: 40px; /* Increased margin for spacing */
+            padding: 10px 0;
+        }
+        .features-timeline-item:after {
+            content: '';
+            display: block;
+            clear: both;
+        }
+        .features-timeline-item .features-timeline-content {
+            position: relative;
+            width: 45%;
+            padding: 20px; /* Increased padding */
+            background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent white for dark background */
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Deeper shadow */
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Lighter border for dark background */
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            color: white; /* Default text color for content box */
+        }
+        .features-timeline-item .features-timeline-content:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .features-timeline-item .features-timeline-content.left {
+            float: left;
+            text-align: right;
+        }
+        .features-timeline-item .features-timeline-content.right {
+            float: right;
+            text-align: left;
+        }
+        .features-timeline-item .features-timeline-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px; /* Larger icon */
+            height: 60px; /* Larger icon */
+            background-color: #6d28d9; /* deep purple-700 */
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem; /* Larger font */
+            font-weight: bold;
+            z-index: 10;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 3px solid #c4b5fd; /* Light purple border */
+        }
+        .features-timeline-item .features-timeline-content.left:before {
+            content: '';
+            position: absolute;
+            top: 25px; /* Adjust arrow position */
+            right: -10px;
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-left: 10px solid rgba(255, 255, 255, 0.1); /* Match content box background */
+        }
+        .features-timeline-item .features-timeline-content.right:before {
+            content: '';
+            position: absolute;
+            top: 25px; /* Adjust arrow position */
+            left: -10px;
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-right: 10px solid rgba(255, 255, 255, 0.1); /* Match content box background */
+        }
+
+        /* Responsive adjustments for features-timeline */
+        @media (max-width: 768px) {
+            .features-timeline:before {
+                left: 20px; /* Move line to left for mobile */
+            }
+            .features-timeline-item .features-timeline-content {
+                width: calc(100% - 60px); /* Adjust width for mobile */
+                float: right; /* All content on right for mobile */
+                text-align: left;
+            }
+            .features-timeline-item .features-timeline-icon {
+                left: 20px; /* Keep icon on the line */
+                transform: translate(-50%, -50%); /* Adjust for new left position */
+                margin-left: 0; /* Remove previous margin */
+            }
+            .features-timeline-item .features-timeline-content.left:before {
+                border-left: none;
+                border-right: 10px solid rgba(255, 255, 255, 0.1); /* Arrow points left, match content box background */
+                left: -10px; /* Position arrow correctly */
+                right: auto;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-lg p-4 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex justify-between items-center container-padding">
+            <a href="index.html" class="text-2xl font-bold text-indigo-800 rounded-lg p-2 hover:bg-indigo-50 transition duration-300">TraceChain</a>
+            <div class="flex space-x-6">
+                <a href="index.html" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-300">Home</a>
+                <a href="#features" class="text-indigo-600 font-medium transition duration-300">Features</a>
+                <a href="#how-it-works" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-300">How It Works</a>
+                <a href="register.html" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-300">Register Product</a>
+                <a href="scan.html" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-300">Scan Product</a>
+                <a href="admin.html" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-300">Admin Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Banner -->
+    <header class="bg-gradient-to-r from-indigo-600 to-purple-700 text-white py-20 px-4 sm:px-6 lg:px-8 hero-pattern flex-grow flex items-center justify-center">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-5xl sm:text-6xl font-extrabold leading-tight mb-6 drop-shadow-lg">
+                Building Trust in Retail with <span class="text-yellow-300">TraceChain</span>
+            </h1>
+            <p class="text-xl sm:text-2xl mb-10 opacity-90">
+                Empowering customers with transparency and ensuring product authenticity through immutable blockchain records.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="register.html" class="bg-white text-indigo-700 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-gray-100 transform hover:scale-105 transition duration-300 ease-in-out">
+                    Get Started
+                </a>
+                <a href="#how-it-works" class="bg-indigo-700 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-indigo-800 transform hover:scale-105 transition duration-300 ease-in-out border border-white">
+                    How It Works
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        <!-- Features Section - Redesigned to Timeline Style -->
+        <section id="features" class="py-16 container-padding" style="background-image: linear-gradient(to bottom right, #2a0050, #000033); color: white;">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-4xl font-bold text-center mb-12 text-white">Key Features</h2>
+                <ul class="features-timeline">
+                    <!-- Feature 1: Product Registration -->
+                    <li class="features-timeline-item">
+                        <div class="features-timeline-icon">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.001 12.001 0 002 12c0 2.757 1.125 5.228 2.93 7.072l.001.001a12.006 12.006 0 0017.07 0l.001-.001A12.001 12.001 0 0022 12c0-2.757-1.125-5.228-2.93-7.072z"></path></svg>
+                        </div>
+                        <div class="features-timeline-content right">
+                            <h3 class="text-2xl font-semibold text-white mb-2">Product Registration</h3>
+                            <p class="text-gray-200">Manufacturers register products with unique IDs and generate QR codes, creating the first immutable record on the blockchain.</p>
+                        </div>
+                    </li>
+                    <!-- Feature 2: End-to-End Traceability -->
+                    <li class="features-timeline-item">
+                        <div class="features-timeline-icon">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h2a2 2 0 002-2v-1a2 2 0 012-2h2.945M22 7v3a2 2 0 01-2 2H3.055m0 0L4 17m7-3h2m-7 0a2 2 0 01-2 2H5a2 2 0 01-2-2v-1a2 2 0 00-2-2h-2a2 2 0 00-2 2v1a2 2 0 01-2 2h-2.945M22 7v3a2 2 0 01-2 2H3.055m0 0L4 17m7-3h2m-7 0a2 2 0 01-2 2H5a2 2 0 01-2-2v-1a2 2 0 00-2-2h-2a2 2 0 00-2 2v1a2 2 0 01-2 2h-2.945"></path></svg>
+                        </div>
+                        <div class="features-timeline-content left">
+                            <h3 class="text-2xl font-semibold text-white mb-2">End-to-End Traceability</h3>
+                            <p class="text-gray-200">Every movement and update in the supply chain is recorded, building a transparent and verifiable history from origin to consumer.</p>
+                        </div>
+                    </li>
+                    <!-- Feature 3: Instant QR Scanning -->
+                    <li class="features-timeline-item">
+                        <div class="features-timeline-icon">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4m16 0a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2a2 2 0 012-2h2a2 2 0 012 2v2zM4 12a2 2 0 012 2h2a2 2 0 012-2v-2a2 2 0 01-2-2H6a2 2 0 01-2 2v2z"></path></svg>
+                        </div>
+                        <div class="features-timeline-content right">
+                            <h3 class="text-2xl font-semibold text-white mb-2">Instant QR Scanning</h3>
+                            <p class="text-gray-200">Customers can easily scan product QR codes using their smartphones to instantly access its full, verified blockchain history.</p>
+                        </div>
+                    </li>
+                    <!-- Feature 4: Analytics & Insights -->
+                    <li class="features-timeline-item">
+                        <div class="features-timeline-icon">
+                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+                        </div>
+                        <div class="features-timeline-content left">
+                            <h3 class="text-2xl font-semibold text-white mb-2">Analytics & Insights</h3>
+                            <p class="text-gray-200">Manufacturers gain real-time insights into product movement, consumer engagement, and supply chain performance through a dedicated dashboard.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- How It Works Section (Original, separate from Features) -->
+        <section id="how-it-works" class="py-16 bg-gray-50 container-padding">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">How It Works</h2>
+                <div class="relative flex flex-col items-center">
+                    <!-- Timeline Steps -->
+                    <div class="space-y-12 md:space-y-0 md:grid md:grid-cols-3 md:gap-12 w-full">
+                        <!-- Step 1 -->
+                        <div class="flex flex-col items-center text-center p-6 bg-white rounded-xl shadow-md border border-gray-200 transform hover:-translate-y-1 transition duration-300">
+                            <div class="w-16 h-16 bg-indigo-500 text-white rounded-full flex items-center justify-center text-3xl font-bold mb-4 shadow-lg">1</div>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">Product Registration</h3>
+                            <p class="text-gray-600">Manufacturers register products, providing details like origin and certifications. A unique QR code is generated and linked to this data on the blockchain.</p>
+                        </div>
+                        <!-- Step 2 -->
+                        <div class="flex flex-col items-center text-center p-6 bg-white rounded-xl shadow-md border border-gray-200 transform hover:-translate-y-1 transition duration-300">
+                            <div class="w-16 h-16 bg-indigo-500 text-white rounded-full flex items-center justify-center text-3xl font-bold mb-4 shadow-lg">2</div>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">Supply Chain Updates</h3>
+                            <p class="text-gray-600">As products move through the supply chain, each significant event (e.g., shipping, warehousing) is recorded, building a comprehensive, immutable history.</p>
+                        </div>
+                        <!-- Step 3 -->
+                        <div class="flex flex-col items-center text-center p-6 bg-white rounded-xl shadow-md border border-gray-200 transform hover:-translate-y-1 transition duration-300">
+                            <div class="w-16 h-16 bg-indigo-500 text-white rounded-full flex items-center justify-center text-3xl font-bold mb-4 shadow-lg">3</div>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">Customer Verification</h3>
+                            <p class="text-gray-600">Customers scan the QR code on the product using our platform to instantly access its full, verified history and details.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- New section for Backend Call Example -->
+            <section class="py-16 bg-white container-padding">
+                <div class="max-w-4xl mx-auto text-center">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-8">Test Backend Connection</h2>
+                    <p class="text-gray-600 mb-6">Click the button below to fetch a message from your Render-deployed backend.</p>
+                    <button id="fetchBackendDataBtn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-blue-700 transform hover:scale-105 transition duration-300 ease-in-out">
+                        Fetch Message from Backend
+                    </button>
+                    <div id="backendResponse" class="mt-8 p-4 bg-gray-100 rounded-lg text-gray-800 hidden">
+                        <p class="font-semibold">Response:</p>
+                        <pre class="whitespace-pre-wrap text-left text-sm" id="backendResponseContent"></pre>
+                    </div>
+                    <div id="backendLoading" class="hidden text-center mt-6">
+                        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+                        <p class="text-gray-600 mt-2">Connecting to backend...</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white py-8 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto text-center container-padding">
+                <p>&copy; 2025 TraceChain. All rights reserved. Building Trust in Retail.</p>
+            </div>
+        </footer>
+
+        <!-- Firebase SDK and Initialization -->
+        <script type="module">
+            // Firebase SDK imports
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+            import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+            import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+            // Global variables for Firebase config and app ID
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+            const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+            let app;
+            let db;
+            let auth;
+            let userId;
+
+            // Backend connection elements
+            const fetchBackendDataBtn = document.getElementById('fetchBackendDataBtn');
+            const backendResponseDiv = document.getElementById('backendResponse');
+            const backendResponseContent = document.getElementById('backendResponseContent');
+            const backendLoadingDiv = document.getElementById('backendLoading');
+
+            // IMPORTANT: Replace with your actual Render backend URL
+            const RENDER_BACKEND_URL = 'https://tracechain-backend-2.onrender.com'; // Updated with your URL!
+
+            /**
+             * Initializes Firebase and authenticates the user.
+             */
+            async function initializeFirebase() {
+                try {
+                    // Initialize Firebase app
+                    app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    auth = getAuth(app);
+
+                    // Authenticate user
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                        console.log("Signed in with custom token.");
+                    } else {
+                        await signInAnonymously(auth);
+                        console.log("Signed in anonymously.");
+                    }
+
+                    // Listen for auth state changes to get the user ID
+                    onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            userId = user.uid;
+                            console.log("Firebase initialized. User ID:", userId);
+                            // You can now use `db` and `userId` for Firestore operations
+                        } else {
+                            console.log("No user signed in.");
+                            // Handle cases where user is not signed in, or sign in anonymously again
+                            signInAnonymously(auth).then(userCredential => {
+                                userId = userCredential.user.uid;
+                                console.log("Signed in anonymously after state change. User ID:", userId);
+                            }).catch(error => {
+                                console.error("Error signing in anonymously:", error);
+                            });
+                        }
+                    });
+
+                } catch (error) {
+                    console.error("Error initializing Firebase or signing in:", error);
+                    // Display an error message to the user if Firebase fails to initialize
+                    const errorMessage = document.createElement('div');
+                    errorMessage.className = 'fixed top-4 left-1/2 -translate-x-1/2 bg-red-500 text-white p-3 rounded-lg shadow-xl z-[1000]';
+                    errorMessage.textContent = 'Failed to connect to backend. Please try again later.';
+                    document.body.appendChild(errorMessage);
+                    setTimeout(() => errorMessage.remove(), 5000);
+                }
+            }
+
+            // Initialize Firebase when the window loads
+            window.onload = initializeFirebase;
+
+            // Event listener for the new backend call button
+            fetchBackendDataBtn.addEventListener('click', async () => {
+                backendResponseDiv.classList.add('hidden');
+                backendLoadingDiv.classList.remove('hidden');
+                fetchBackendDataBtn.disabled = true;
+
+                try {
+                    const response = await fetch(`${RENDER_BACKEND_URL}/api/message`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    backendResponseContent.textContent = JSON.stringify(data, null, 2);
+                    backendResponseDiv.classList.remove('hidden');
+                } catch (error) {
+                    console.error("Error fetching from backend:", error);
+                    backendResponseContent.textContent = `Error: ${error.message}. Check console for details. Make sure CORS is configured on your Render backend.`;
+                    backendResponseDiv.classList.remove('hidden');
+                    // Show a more user-friendly error in the UI or modal if needed
+                } finally {
+                    backendLoadingDiv.classList.add('hidden');
+                    fetchBackendDataBtn.disabled = false;
+                }
+            });
+        </script>
+</body>
+</html>
