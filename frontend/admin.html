@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TraceChain - Admin Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Light blue-gray background */
+            color: #334155; /* Darker text for readability */
+        }
+        .container-padding {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        @media (min-width: 640px) {
+            .container-padding {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
+        @media (min-width: 1024px) {
+            .container-padding {
+                padding-left: 4rem;
+                padding-right: 4rem;
+            }
+        }
+        /* Custom modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navigation Bar (Copied for consistency) -->
+    <nav class="bg-white shadow-lg p-4 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex justify-between items-center container-padding">
+            <a href="index.html" class="text-2xl font-bold text-indigo-700 rounded-lg p-2 hover:bg-indigo-50 transition duration-300">TraceChain</a>
+            <div class="flex space-x-6">
+                <a href="index.html" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-300">Home</a>
+                <a href="index.html#features" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-300">Features</a>
+                <a href="index.html#how-it-works" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-300">How It Works</a>
+                <a href="register.html" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-300">Register Product</a>
+                <a href="scan.html" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-300">Scan Product</a>
+                <a href="admin.html" class="text-indigo-600 font-medium transition duration-300">Admin Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow py-16 container-padding">
+        <!-- Main Dashboard Content Area with background -->
+        <div class="max-w-5xl mx-auto p-8 rounded-xl shadow-lg border border-gray-200"
+             style="background-image: linear-gradient(to bottom right, #2a0050, #000033); color: white;">
+
+            <h2 class="text-4xl font-bold text-center mb-4 text-white">Admin Dashboard</h2>
+            <p class="text-center text-gray-200 mb-8">Manage your registered products and add new traceability events.</p>
+
+            <!-- User ID Display -->
+            <div class="bg-gray-800 p-4 rounded-lg mb-8 text-center border border-gray-700">
+                <p class="text-gray-200 font-semibold">Your User ID:</p>
+                <p id="currentUserId" class="text-indigo-400 font-mono text-sm break-all"></p>
+                <p class="text-sm text-gray-400 mt-2">This ID identifies your registered products.</p>
+            </div>
+
+            <!-- Dashboard Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                <div class="bg-blue-900 p-6 rounded-xl shadow-md border border-blue-700 text-center">
+                    <h3 class="text-2xl font-semibold text-blue-300">Total Registered Products</h3>
+                    <p id="totalProductsCount" class="text-5xl font-bold text-blue-100 mt-4">0</p>
+                </div>
+                <div class="bg-green-900 p-6 rounded-xl shadow-md border border-green-700 text-center">
+                    <h3 class="text-2xl font-semibold text-green-300">Products with Trace Events</h3>
+                    <p id="productsWithEventsCount" class="text-5xl font-bold text-green-100 mt-4">0</p>
+                </div>
+            </div>
+
+            <!-- Add Trace Event Section -->
+            <div class="bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700 mb-12">
+                <h3 class="text-3xl font-bold text-center mb-6 text-white">Add New Trace Event</h3>
+                <p class="text-center text-gray-200 mb-6">Select a product and add a new step to its traceability history.</p>
+
+                <form id="addTraceEventForm" class="space-y-6">
+                    <div>
+                        <label for="productSearchInput" class="block text-gray-200 text-sm font-semibold mb-2">Search or Select Product <span class="text-red-400">*</span></label>
+                        <input list="productsDatalist" id="productSearchInput" name="productSearchInput"
+                               required class="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-700 text-white"
+                               placeholder="Type product name or ID to search...">
+                        <datalist id="productsDatalist">
+                            <!-- Options will be loaded dynamically by JS -->
+                        </datalist>
+                    </div>
+                    <div>
+                        <label for="eventDescription" class="block text-gray-200 text-sm font-semibold mb-2">Event Description <span class="text-red-400">*</span></label>
+                        <input type="text" id="eventDescription" required class="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-700 text-white" placeholder="e.g., Shipped from Factory, Arrived at Warehouse">
+                    </div>
+                    <div>
+                        <label for="eventLocation" class="block text-gray-200 text-sm font-semibold mb-2">Location (Optional)</label>
+                        <input type="text" id="eventLocation" class="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-700 text-white" placeholder="e.g., Port of Mumbai, Distribution Center A">
+                    </div>
+                    <div>
+                        <label for="eventHandler" class="block text-gray-200 text-sm font-semibold mb-2">Handler (Optional)</label>
+                        <input type="text" id="eventHandler" class="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-700 text-white" placeholder="e.g., Logistics Partner XYZ, Warehouse Team">
+                    </div>
+                    <button type="submit" id="addEventButton" class="w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-indigo-700 transform hover:scale-105 transition duration-300 ease-in-out">
+                        Add Trace Event
+                    </button>
+                </form>
+                <div id="addEventLoading" class="hidden text-center mt-6">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-500 border-t-transparent"></div>
+                    <p class="text-gray-200 mt-2">Adding event...</p>
+                </div>
+            </div>
+
+            <!-- Registered Products List -->
+            <div class="bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700">
+                <h3 class="text-3xl font-bold text-center mb-6 text-white">Your Registered Products</h3>
+                <div id="productsList" class="space-y-4">
+                    <!-- Products will be loaded here -->
+                    <p id="noProductsMessage" class="text-center text-gray-400 hidden">No products registered yet. Go to "Register Product" to add one!</p>
+                </div>
+                <div id="productsListLoading" class="text-center mt-6">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-500 border-t-transparent"></div>
+                    <p class="text-gray-200 mt-2">Loading products...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer (Copied for consistency) -->
+    <footer class="bg-gray-800 text-white py-8 px-4 sm:px-6 lg:px-8 mt-auto">
+        <div class="max-w-7xl mx-auto text-center container-padding">
+            <p>&copy; 2025 TraceChain. All rights reserved. Building Trust in Retail.</p>
+        </div>
+    </footer>
+
+    <!-- Custom Modal for Messages -->
+    <div id="messageModal" class="modal flex">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <p id="modalMessage" class="text-lg font-medium text-gray-800"></p>
+            <button id="modalCloseBtn" class="mt-6 bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-300">Close</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK and Initialization -->
+    <script type="module">
+        // Firebase SDK imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs, doc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables for Firebase config and app ID
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let app;
+        let db;
+        let auth;
+        let userId = null; // Initialize userId to null
+        let registeredProducts = []; // To store product data for dropdown and list
+
+        // Get references to DOM elements
+        const currentUserIdDisplay = document.getElementById('currentUserId');
+        const totalProductsCount = document.getElementById('totalProductsCount');
+        const productsWithEventsCount = document.getElementById('productsWithEventsCount');
+        const addTraceEventForm = document.getElementById('addTraceEventForm');
+        const productSearchInput = document.getElementById('productSearchInput'); // New: Input for datalist
+        const productsDatalist = document.getElementById('productsDatalist'); // New: Datalist element
+        const eventDescriptionInput = document.getElementById('eventDescription');
+        const eventLocationInput = document.getElementById('eventLocation');
+        const eventHandlerInput = document.getElementById('eventHandler');
+        const addEventButton = document.getElementById('addEventButton');
+        const addEventLoading = document.getElementById('addEventLoading');
+        const productsList = document.getElementById('productsList');
+        const noProductsMessage = document.getElementById('noProductsMessage');
+        const productsListLoading = document.getElementById('productsListLoading');
+
+        // Modal elements
+        const messageModal = document.getElementById('messageModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
+        const closeButton = document.querySelector('.close-button');
+
+        /**
+         * Displays a custom modal message to the user.
+         * @param {string} message - The message to display.
+         * @param {string} type - 'success' or 'error' to style the message.
+         */
+        function showModalMessage(message, type = 'info') {
+            modalMessage.textContent = message;
+            modalMessage.className = 'text-lg font-medium'; // Reset classes
+            if (type === 'success') {
+                modalMessage.classList.add('text-green-700');
+            } else if (type === 'error') {
+                modalMessage.classList.add('text-red-700');
+            } else {
+                modalMessage.classList.add('text-gray-800');
+            }
+            messageModal.style.display = 'flex'; // Show the modal
+        }
+
+        // Close modal event listeners
+        closeButton.onclick = () => {
+            messageModal.style.display = 'none';
+        };
+        modalCloseBtn.onclick = () => {
+            messageModal.style.display = 'none';
+        };
+        window.onclick = (event) => {
+            if (event.target == messageModal) {
+                messageModal.style.display = 'none';
+            }
+        };
+
+        /**
+         * Initializes Firebase and authenticates the user.
+         */
+        async function initializeFirebase() {
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Use onAuthStateChanged to ensure userId is set before fetching data
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        currentUserIdDisplay.textContent = userId;
+                        console.log("Firebase: Initialized. User ID:", userId);
+                        await fetchRegisteredProducts(); // Fetch products once authenticated
+                    } else {
+                        console.log("Firebase: No user signed in. Attempting anonymous sign-in.");
+                        try {
+                            const userCredential = await signInAnonymously(auth);
+                            userId = userCredential.user.uid;
+                            currentUserIdDisplay.textContent = userId;
+                            console.log("Firebase: Signed in anonymously after state change. User ID:", userId);
+                            await fetchRegisteredProducts();
+                        } catch (error) {
+                            console.error("Firebase: Error signing in anonymously:", error);
+                            showModalMessage("Failed to authenticate. Please refresh the page.", 'error');
+                            productsListLoading.classList.add('hidden');
+                            noProductsMessage.textContent = "Authentication failed. Cannot load products.";
+                            noProductsMessage.classList.remove('hidden');
+                        }
+                    }
+                });
+
+                // If initialAuthToken is present, try to sign in with it immediately
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                    console.log("Firebase: Attempted sign-in with custom token.");
+                }
+
+            } catch (error) {
+                console.error("Firebase: Error initializing Firebase or signing in:", error);
+                showModalMessage("Failed to connect to backend. Please check your console for details.", 'error');
+                productsListLoading.classList.add('hidden');
+                noProductsMessage.textContent = "Backend connection failed. Cannot load products.";
+                noProductsMessage.classList.remove('hidden');
+            }
+        }
+
+        window.onload = initializeFirebase;
+
+        /**
+         * Fetches all products registered by the current user and updates the dashboard.
+         */
+        async function fetchRegisteredProducts() {
+            if (!userId) {
+                console.warn("Cannot fetch products: User not authenticated.");
+                productsListLoading.classList.add('hidden');
+                noProductsMessage.textContent = "Please wait for authentication to load products.";
+                noProductsMessage.classList.remove('hidden');
+                return;
+            }
+
+            productsListLoading.classList.remove('hidden');
+            productsList.innerHTML = ''; // Clear previous list
+            productsDatalist.innerHTML = ''; // Clear previous datalist options
+            noProductsMessage.classList.add('hidden');
+            registeredProducts = []; // Clear stored products
+
+            try {
+                const productsCollectionPath = `artifacts/${appId}/users/${userId}/products`;
+                console.log("Firestore: Attempting to fetch from collection:", productsCollectionPath); // Log the path for debugging permissions
+                const productsCollectionRef = collection(db, productsCollectionPath);
+                const q = query(productsCollectionRef); // No 'where' clause needed to get all for this user
+                const querySnapshot = await getDocs(q);
+
+                let productsWithEvents = 0;
+
+                if (!querySnapshot.empty) {
+                    querySnapshot.forEach(doc => {
+                        const product = { id: doc.id, ...doc.data() };
+                        registeredProducts.push(product);
+
+                        // Populate datalist
+                        const option = document.createElement('option');
+                        option.value = `${product.productName} (ID: ${product.productId.substring(0, 8)}...)`;
+                        // Store the Firestore document ID in a data attribute for later retrieval
+                        option.dataset.docId = doc.id;
+                        productsDatalist.appendChild(option);
+
+                        // Populate products list
+                        const productCard = document.createElement('div');
+                        // Adjusted text colors for product cards to be readable on dark background
+                        productCard.className = 'bg-gray-700 p-4 rounded-lg border border-gray-600 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center';
+                        productCard.innerHTML = `
+                            <div>
+                                <p class="text-lg font-semibold text-white">${product.productName}</p>
+                                <p class="text-sm text-gray-300">ID: <span class="font-mono break-all">${product.productId}</span></p>
+                                <p class="text-sm text-gray-300">Origin: ${product.productOrigin}</p>
+                                <p class="text-sm text-gray-300">Type: ${product.productType || 'N/A'}</p>
+                                <p class="text-sm text-gray-300">Events: ${product.traceEvents ? product.traceEvents.length : 0}</p>
+                            </div>
+                            <div class="mt-3 sm:mt-0">
+                                <a href="history.html?productId=${product.productId}" class="bg-indigo-500 text-white text-sm py-2 px-4 rounded-lg hover:bg-indigo-600 transition duration-300 mr-2">View History</a>
+                                <a href="scan.html?productId=${product.productId}" class="bg-purple-500 text-white text-sm py-2 px-4 rounded-lg hover:bg-purple-600 transition duration-300">Scan Product</a>
+                            </div>
+                        `;
+                        productsList.appendChild(productCard);
+
+                        if (product.traceEvents && product.traceEvents.length > 1) { // >1 because initial registration is always 1
+                            productsWithEvents++;
+                        }
+                    });
+                    totalProductsCount.textContent = registeredProducts.length;
+                    productsWithEventsCount.textContent = productsWithEvents;
+                } else {
+                    noProductsMessage.classList.remove('hidden');
+                    totalProductsCount.textContent = 0;
+                    productsWithEventsCount.textContent = 0;
+                }
+            } catch (error) {
+                console.error("Error fetching registered products:", error);
+                showModalMessage("Error loading your products. Please try again.", 'error');
+                noProductsMessage.textContent = "Error loading products.";
+                noProductsMessage.classList.remove('hidden');
+            } finally {
+                productsListLoading.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Handles adding a new trace event to a selected product.
+         * @param {Event} event - The form submission event.
+         */
+        addTraceEventForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            if (!userId) {
+                showModalMessage("Authentication not ready. Please wait a moment.", 'error');
+                return;
+            }
+
+            const enteredProductName = productSearchInput.value.trim();
+            const eventDescription = eventDescriptionInput.value.trim();
+            const eventLocation = eventLocationInput.value.trim();
+            const eventHandler = eventHandlerInput.value.trim();
+
+            if (!enteredProductName) {
+                showModalMessage("Please type or select a product.", 'error');
+                return;
+            }
+            if (!eventDescription) {
+                showModalMessage("Event Description is required.", 'error');
+                return;
+            }
+
+            // Find the product's Firestore document ID based on the entered name/ID
+            const selectedProduct = registeredProducts.find(p =>
+                `${p.productName} (ID: ${p.productId.substring(0, 8)}...)` === enteredProductName ||
+                p.productId === enteredProductName // Allow direct ID entry too
+            );
+
+            if (!selectedProduct) {
+                showModalMessage("Selected product not found. Please choose from the list or enter a valid Product ID.", 'error');
+                return;
+            }
+
+            const selectedDocId = selectedProduct.id; // Get the Firestore document ID
+
+            addEventLoading.classList.remove('hidden');
+            addEventButton.disabled = true;
+
+            try {
+                const productDocRef = doc(db, `artifacts/${appId}/users/${userId}/products`, selectedDocId);
+
+                const newTraceEvent = {
+                    timestamp: new Date().toISOString(), // Use ISO string for timestamp in array
+                    description: eventDescription,
+                    location: eventLocation || 'N/A',
+                    handler: eventHandler || userId // Default to current user if handler not provided
+                };
+
+                // Use arrayUnion to safely add the new event to the traceEvents array
+                await updateDoc(productDocRef, {
+                    traceEvents: arrayUnion(newTraceEvent)
+                });
+
+                showModalMessage("Trace event added successfully!", 'success');
+                addTraceEventForm.reset();
+                await fetchRegisteredProducts(); // Refresh the list and counts after update
+
+            } catch (error) {
+                console.error("Error adding trace event:", error);
+                showModalMessage("Error adding trace event. Please try again.", 'error');
+            } finally {
+                addEventLoading.classList.add('hidden');
+                addEventButton.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

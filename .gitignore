@@ -1,3 +1,20 @@
+# Dependencies
+backend/node_modules/
+frontend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+backend/.env
+.env
+
+# Logs
+*.log
+*.log.*
+logs/
+
+# Build artifacts
 *.tar
 *.tar.*
 *.jar
@@ -6,9 +23,32 @@
 *.deb
 *.zip
 *.tgz
-*.log
-*.log.*
 *.sig
 
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Dependency directories
 pkg/
 src/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# VS Code settings
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
