@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TraceChain - Register Product</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Light blue-gray background */
+            color: #334155; /* Darker text for readability */
+        }
+        .container-padding {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        @media (min-width: 640px) {
+            .container-padding {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
+        @media (min-width: 1024px) {
+            .container-padding {
+                padding-left: 4rem;
+                padding-right: 4rem;
+            }
+        }
+        /* Custom modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navigation Bar (Copied from index.html for consistency) -->
+    <nav class="bg-white shadow-lg p-4 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex justify-between items-center container-padding">
+            <a href="index.html" class="text-2xl font-bold text-indigo-700 rounded-lg p-2 hover:bg-indigo-50 transition duration-300">TraceChain</a>
+            <div class="flex space-x-6">
+                <a href="index.html" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-300">Home</a>
+                <a href="index.html#features" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-300">Features</a>
+                <a href="index.html#how-it-works" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-300">How It Works</a>
+                <a href="register.html" class="text-indigo-600 font-medium transition duration-300">Register Product</a>
+                <a href="scan.html" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-300">Scan Product</a>
+                <a href="admin.html" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-300">Admin Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow py-16 container-padding">
+        <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-4xl font-bold text-center mb-8 text-gray-800">Register New Product</h2>
+            <p class="text-center text-gray-600 mb-8">Fill in the product details below to register it on the TraceChain platform and generate a unique QR code.</p>
+
+            <form id="productRegistrationForm" class="space-y-6">
+                <div>
+                    <label for="productName" class="block text-gray-700 text-sm font-semibold mb-2">Product Name <span class="text-red-500">*</span></label>
+                    <input type="text" id="productName" name="productName" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label for="manufacturer" class="block text-gray-700 text-sm font-semibold mb-2">Manufacturer <span class="text-red-500">*</span></label>
+                    <input type="text" id="manufacturer" name="manufacturer" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., ABC Corp, XYZ Manufacturing">
+                </div>
+                <div>
+                    <label for="category" class="block text-gray-700 text-sm font-semibold mb-2">Category <span class="text-red-500">*</span></label>
+                    <select id="category" name="category" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="">Select a category</option>
+                        <option value="Food & Beverages">Food & Beverages</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Textiles">Textiles</option>
+                        <option value="Pharmaceuticals">Pharmaceuticals</option>
+                        <option value="Automotive">Automotive</option>
+                        <option value="Agriculture">Agriculture</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="productOrigin" class="block text-gray-700 text-sm font-semibold mb-2">Origin <span class="text-red-500">*</span></label>
+                    <input type="text" id="productOrigin" name="productOrigin" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., India, Organic Farm XYZ">
+                </div>
+                <div>
+                    <label for="certifications" class="block text-gray-700 text-sm font-semibold mb-2">Certifications (comma-separated)</label>
+                    <input type="text" id="certifications" name="certifications" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., Organic, Fair Trade, ISO 9001">
+                </div>
+                <div>
+                    <label for="batchNumber" class="block text-gray-700 text-sm font-semibold mb-2">Batch Number</label>
+                    <input type="text" id="batchNumber" name="batchNumber" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., BT2024001">
+                </div>
+                <div>
+                    <label for="productDescription" class="block text-gray-700 text-sm font-semibold mb-2">Description</label>
+                    <textarea id="productDescription" name="productDescription" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="Brief description of the product and its key features."></textarea>
+                    <button type="button" id="generateDescriptionBtn" class="mt-2 w-full bg-purple-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-purple-600 transform hover:scale-105 transition duration-300 ease-in-out flex items-center justify-center">
+                        <span id="generateDescriptionText">✨ Generate with AI (Optional)</span>
+                        <div id="generateDescriptionLoading" class="hidden inline-block animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent ml-2"></div>
+                    </button>
+                </div>
+                <button type="submit" id="registerButton" class="w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-indigo-700 transform hover:scale-105 transition duration-300 ease-in-out">
+                    Register Product & Generate QR
+                </button>
+            </form>
+
+            <!-- Loading Indicator for Registration -->
+            <div id="loadingIndicator" class="hidden text-center mt-6">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-500 border-t-transparent"></div>
+                <p class="text-gray-600 mt-2">Registering product and generating QR code...</p>
+            </div>
+
+            <!-- QR Code Display Section -->
+            <div id="qrCodeSection" class="mt-12 p-6 bg-gray-50 rounded-xl border border-gray-200 text-center hidden">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Product Registered!</h3>
+                <p class="text-gray-600 mb-4">Here is the unique QR code for your product. Please print and attach it to your product packaging.</p>
+                <p class="text-gray-700 font-semibold mb-4">Product ID: <span id="displayProductId" class="text-indigo-600"></span></p>
+                <div class="flex justify-center items-center mb-6">
+                    <img id="qrCodeImage" src="" alt="Generated QR Code" class="w-48 h-48 border border-gray-300 rounded-lg shadow-md p-2">
+                </div>
+                <button id="copyProductIdBtn" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300 mr-2">
+                    Copy Product ID
+                </button>
+                <button id="downloadQrBtn" class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300">
+                    Download QR Code
+                </button>
+                <p id="copyMessage" class="text-sm text-gray-500 mt-2 hidden">Product ID copied to clipboard!</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer (Copied from index.html for consistency) -->
+    <footer class="bg-gray-800 text-white py-8 px-4 sm:px-6 lg:px-8 mt-auto">
+        <div class="max-w-7xl mx-auto text-center container-padding">
+            <p>&copy; 2025 TraceChain. All rights reserved. Building Trust in Retail.</p>
+        </div>
+    </footer>
+
+    <!-- Custom Modal for Messages -->
+    <div id="messageModal" class="modal flex">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <p id="modalMessage" class="text-lg font-medium text-gray-800"></p>
+            <button id="modalCloseBtn" class="mt-6 bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-300">Close</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK and Initialization -->
+    <script>
+        // Backend Configuration
+        const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+            ? 'http://localhost:3000' 
+            : 'https://tracechain-backend-2.onrender.com';
+
+        // Get references to DOM elements
+        const productRegistrationForm = document.getElementById('productRegistrationForm');
+        const productNameInput = document.getElementById('productName');
+        const manufacturerInput = document.getElementById('manufacturer');
+        const categoryInput = document.getElementById('category');
+        const productOriginInput = document.getElementById('productOrigin');
+        const productDescriptionInput = document.getElementById('productDescription');
+        const certificationsInput = document.getElementById('certifications');
+        const batchNumberInput = document.getElementById('batchNumber');
+        const registerButton = document.getElementById('registerButton');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const qrCodeSection = document.getElementById('qrCodeSection');
+        const qrCodeImage = document.getElementById('qrCodeImage');
+        const displayProductId = document.getElementById('displayProductId');
+        const copyProductIdBtn = document.getElementById('copyProductIdBtn');
+        const downloadQrBtn = document.getElementById('downloadQrBtn');
+        const copyMessage = document.getElementById('copyMessage');
+
+        // New LLM elements
+        const generateDescriptionBtn = document.getElementById('generateDescriptionBtn');
+        const generateDescriptionText = document.getElementById('generateDescriptionText');
+        const generateDescriptionLoading = document.getElementById('generateDescriptionLoading');
+
+
+        // Modal elements
+        const messageModal = document.getElementById('messageModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
+        const closeButton = document.querySelector('.close-button');
+
+        /**
+         * Displays a custom modal message to the user.
+         * @param {string} message - The message to display.
+         * @param {string} type - 'success' or 'error' to style the message.
+         */
+        function showModalMessage(message, type = 'info') {
+            modalMessage.textContent = message;
+            modalMessage.className = 'text-lg font-medium'; // Reset classes
+            if (type === 'success') {
+                modalMessage.classList.add('text-green-700');
+            } else if (type === 'error') {
+                modalMessage.classList.add('text-red-700');
+            } else {
+                modalMessage.classList.add('text-gray-800');
+            }
+            messageModal.style.display = 'flex'; // Show the modal
+        }
+
+        // Close modal event listeners
+        closeButton.onclick = () => {
+            messageModal.style.display = 'none';
+        };
+        modalCloseBtn.onclick = () => {
+            messageModal.style.display = 'none';
+        };
+        window.onclick = (event) => {
+            if (event.target == messageModal) {
+                messageModal.style.display = 'none';
+            }
+        };
+
+        /**
+         * Test backend connection and initialize page
+         */
+        async function initializePage() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/health`);
+                if (response.ok) {
+                    console.log('Backend connection successful');
+                } else {
+                    console.error('Backend connection failed:', response.status);
+                    showModalMessage("Backend connection failed. Please check if the server is running.", 'error');
+                }
+            } catch (error) {
+                console.error('Backend connection error:', error);
+                showModalMessage("Failed to connect to backend. Please check your connection.", 'error');
+            }
+        }
+
+        // Call initialization when the window loads
+        window.onload = () => {
+            registerButton.disabled = false; // Enable button
+            registerButton.textContent = 'Register Product & Generate QR';
+            generateDescriptionBtn.disabled = false; // Enable LLM button
+            generateDescriptionText.textContent = 'Generate with AI';
+            initializePage();
+        };
+
+        /**
+         * Handles the product registration form submission.
+         * @param {Event} event - The form submission event.
+         */
+        productRegistrationForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default form submission
+
+            // Show loading indicator and disable button
+            loadingIndicator.classList.remove('hidden');
+            registerButton.disabled = true;
+            qrCodeSection.classList.add('hidden'); // Hide previous QR code if any
+
+            const productName = productNameInput.value.trim();
+            const manufacturer = manufacturerInput.value.trim();
+            const category = categoryInput.value.trim();
+            const productOrigin = productOriginInput.value.trim();
+            const productDescription = productDescriptionInput.value.trim();
+            const certifications = certificationsInput.value.split(',').map(c => c.trim()).filter(c => c !== '');
+            const batchNumber = batchNumberInput.value.trim();
+
+            if (!productName || !manufacturer || !category || !productOrigin) {
+                showModalMessage("Product Name, Manufacturer, Category, and Origin are required fields.", 'error');
+                loadingIndicator.classList.add('hidden');
+                registerButton.disabled = false;
+                return;
+            }
+
+            const productData = {
+                productName: productName,
+                manufacturer: manufacturer,
+                category: category,
+                origin: productOrigin,
+                description: productDescription,
+                certifications: certifications,
+                batchNumber: batchNumber
+            };
+
+            try {
+                // Register product with MongoDB backend
+                console.log('Sending product data:', productData);
+                const response = await fetch(`${BACKEND_URL}/api/products/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(productData)
+                });
+
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('Error response:', errorData);
+                    throw new Error(errorData.error || errorData.message || 'Failed to register product');
+                }
+
+                const result = await response.json();
+                console.log('Success response:', result);
+                const productId = result.data.productId;
+                const qrCodeUrl = result.data.qrCode;
+
+                // Display the QR code and product ID
+                qrCodeImage.src = qrCodeUrl;
+                displayProductId.textContent = productId;
+                qrCodeSection.classList.remove('hidden');
+                productRegistrationForm.reset(); // Clear the form
+                showModalMessage("Product registered successfully!", 'success');
+
+            } catch (error) {
+                console.error("Error registering product:", error);
+                showModalMessage(`Error registering product: ${error.message}`, 'error');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+                registerButton.disabled = false;
+            }
+        });
+
+        // AI Description Generation Feature
+        generateDescriptionBtn.addEventListener('click', async () => {
+            const productName = productNameInput.value.trim();
+            const productOrigin = productOriginInput.value.trim();
+            const certifications = certificationsInput.value.trim();
+
+            if (!productName && !productOrigin && !certifications) {
+                showModalMessage("Please enter at least Product Name, Origin, or Certifications to generate a description.", 'info');
+                return;
+            }
+
+            // Show info about AI feature configuration
+            showModalMessage("AI Description Generation is currently not configured. Please add your Google Gemini API key in the code to enable this feature, or write your description manually.", 'info');
+            return;
+
+            // Note: To enable AI generation, uncomment the code below and add your API key
+            /*
+            generateDescriptionText.classList.add('hidden');
+            generateDescriptionLoading.classList.remove('hidden');
+            generateDescriptionBtn.disabled = true;
+            productDescriptionInput.placeholder = 'Generating description...';
+
+            let prompt = `Generate a concise and engaging product description for a product.`;
+            if (productName) prompt += ` The product is named "${productName}".`;
+            if (productOrigin) prompt += ` It originates from "${productOrigin}".`;
+            if (certifications) prompt += ` It has the following certifications: "${certifications}".`;
+            prompt += ` Focus on transparency, authenticity, and quality, suitable for a blockchain-traced product. Keep it under 150 words.`;
+
+            try {
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                const apiKey = "YOUR_GOOGLE_GEMINI_API_KEY_HERE"; // Add your API key here
+                
+                if (!apiKey || apiKey === "YOUR_GOOGLE_GEMINI_API_KEY_HERE") {
+                    throw new Error("API key not configured");
+                }
+                
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed: ${response.status}`);
+                }
+
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const generatedText = result.candidates[0].content.parts[0].text;
+                    productDescriptionInput.value = generatedText;
+                    showModalMessage("Description generated successfully!", 'success');
+                } else {
+                    console.error("AI: Unexpected response structure:", result);
+                    showModalMessage("Failed to generate description. Please try writing it manually.", 'error');
+                }
+            } catch (error) {
+                console.error("AI: Error generating description:", error);
+                if (error.message === "API key not configured") {
+                    showModalMessage("AI feature requires API key configuration. Please write your description manually.", 'info');
+                } else {
+                    showModalMessage("AI service unavailable. Please write your description manually.", 'error');
+                }
+            } finally {
+                generateDescriptionText.classList.remove('hidden');
+                generateDescriptionLoading.classList.add('hidden');
+                generateDescriptionBtn.disabled = false;
+                productDescriptionInput.placeholder = 'Brief description of the product and its key features.';
+            }
+            */
+        });
+
+        // Copy Product ID to clipboard
+        copyProductIdBtn.addEventListener('click', () => {
+            const productIdText = displayProductId.textContent;
+            if (productIdText) {
+                // Using document.execCommand('copy') for better iframe compatibility
+                const tempInput = document.createElement('textarea');
+                tempInput.value = productIdText;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+
+                copyMessage.classList.remove('hidden');
+                setTimeout(() => {
+                    copyMessage.classList.add('hidden');
+                }, 2000);
+            }
+        });
+
+        // Download QR Code
+        downloadQrBtn.addEventListener('click', async () => {
+            const imageUrl = qrCodeImage.src;
+            if (imageUrl) {
+                try {
+                    const response = await fetch(imageUrl);
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `tracechain_qr_${displayProductId.textContent}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                } catch (error) {
+                    console.error("Error downloading QR code:", error);
+                    showModalMessage("Failed to download QR code. Please try again.", 'error');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
